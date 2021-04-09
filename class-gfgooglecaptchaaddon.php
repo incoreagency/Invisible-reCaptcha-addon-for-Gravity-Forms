@@ -235,6 +235,14 @@ class gfgooglecaptchaaddon extends GFAddOn {
 						'feedback_callback' => array( $this, 'is_valid_setting' ),
 					),
 					array(
+						'label'             => esc_html__( 'Minimal score to pass', 'gf-google-recaptcha-3' ),
+						'type'              => 'text',
+						'name'              => 'minimal_score_to_validate',
+						'tooltip'           => esc_html__( '0 being the minimum, 1 being the maximum', 'gf-google-recaptcha-3' ),
+						'class'             => '',
+						'feedback_callback' => array( $this, 'is_valid_setting' ),
+					),
+					array(
 						'label'             => esc_html__( 'reCaptcha Badge', 'gf-google-recaptcha-3' ),
 						'type'              => 'checkbox',
 						'name'              => 'google_recaptcha_badge_visibility',

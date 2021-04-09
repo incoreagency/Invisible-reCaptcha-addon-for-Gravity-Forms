@@ -119,8 +119,12 @@ class Recaptcha_Score_GF_Field extends GF_Field {
 
  		$score = is_array( $value ) ? rgar( $value, 0 ) : $value; // Form objects created in 1.8 will supply a string as the value.
 
+		$instance = gfgooglecaptchaaddon::get_instance();
+		$settings = $instance->get_plugin_settings();
+		$minimal = (float)($settings['minimal_score_to_validate'] ?: 0);
+		
 		// If the score is not a value, or above 1, below 0. Summat wrong!
- 		if ( !is_numeric($score) || !$this->isNumberBetween(floatval($score), 1, 0) ) {
+		if ( !is_numeric($score) || !$this->isNumberBetween(floatval($score), 1, $minimal) ) {
  			$this->failed_validation  = true;
  			$this->validation_message = empty( $this->errorMessage ) ? esc_html__( 'Seems as though you are a bot. Please try another way of contacting.', 'gf-google-recaptcha-3' ) : $this->errorMessage;
  		}

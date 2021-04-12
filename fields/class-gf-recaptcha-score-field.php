@@ -28,6 +28,7 @@ class Recaptcha_Score_GF_Field extends GF_Field {
     public function is_conditional_logic_supported(){
 		return false;
 	}
+	
 
 	public function get_form_editor_button() {
 	    return array(
@@ -40,6 +41,7 @@ class Recaptcha_Score_GF_Field extends GF_Field {
 		return array(
 			'error_message_setting',
 			'label_setting',
+			'css_class_setting'
 		);
 	}
 
@@ -103,7 +105,7 @@ class Recaptcha_Score_GF_Field extends GF_Field {
 			$field_content = sprintf( "{FIELD}%s", $validation_message );
 		}
 
-		return $field_content;
+		return $field_content . '<div class="gf-recaptcha-div"></div>';
 	}
 
 	/**

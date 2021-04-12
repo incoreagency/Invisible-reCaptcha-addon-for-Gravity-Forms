@@ -43,19 +43,35 @@ class gfgooglecaptchaaddon extends GFAddOn {
 		add_filter( 'body_class', array( $this, 'set_body_class_name') );
 		add_action( 'wp_ajax_check_google_token_request', array( $this, 'check_google_token_request'), 99 );
 		add_action( 'wp_ajax_nopriv_check_google_token_request', array( $this, 'check_google_token_request' ), 99 );
-		add_filter( 'gform_form_tag', array( $this, 'gf_google_captcha' ), 10, 2 );
+		add_filter( 'gform_pre_render', array( $this, 'gf_google_captcha' ), 10, 1 );
 	}
 
 	/**
 	 * Loop through all forms and add a new div tag for Google scripts
-	 * @param  string $form_tag The tag
 	 * @param  [type] $form     The form
 	 * @return string           The form string with the new code pre-pended
 	 */
-	function gf_google_captcha( $form_tag, $form  ){
+	function gf_google_captcha($form) {
+		if ($form['fields'] && count($form['fields'])) {
+			foreach($form['fields'] as $k=>$v) {
+				if ($v instanceof Recaptcha_Score_GF_Field) {
+					$new_field_id = GFFormsModel::get_next_field_id( $form['fields'] );
+					$props = [
+						'id' => $new_field_id,
+						'type' => 'html',
+						'formId' => $form['id'],
+						'displayOnly' => 1,
+						'visibility' => 'visible',
+						'content' => '<div class="gf-recaptcha-div"></div>'
+					];
+					$field = GF_Fields::create($props);
+					$form['fields'][] = $field;
+					// $form_tag = $form_tag . '<div class="gf-recaptcha-div"></div>';
+				}
+			}
+		}
 		// Add Google Captcha div for holding async code
-		$form_tag = $form_tag . '<div class="gf-recaptcha-div"></div>';
-		return $form_tag;
+		return $form;
 	}
 
 	public function check_google_token_request() {

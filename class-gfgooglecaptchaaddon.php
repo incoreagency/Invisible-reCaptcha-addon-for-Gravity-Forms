@@ -43,6 +43,7 @@ class gfgooglecaptchaaddon extends GFAddOn {
 		add_filter( 'body_class', array( $this, 'set_body_class_name') );
 		add_action( 'wp_ajax_check_google_token_request', array( $this, 'check_google_token_request'), 99 );
 		add_action( 'wp_ajax_nopriv_check_google_token_request', array( $this, 'check_google_token_request' ), 99 );
+		add_filter( 'gform_entry_is_spam', array( $this, 'check_if_is_spam' ), 100, 3);
 	}
 
 	public function check_google_token_request() {
@@ -92,6 +93,34 @@ class gfgooglecaptchaaddon extends GFAddOn {
 			die;
 		}
 
+	}
+
+	/**
+	 * Mark as spam if score is not in the range.
+	 * 
+	 */
+	public function check_if_is_spam($is_spam, $form, $entry) {
+		foreach ($form['fields'] as $field) {
+			if ($field instanceof Recaptcha_Score_GF_Field) {
+				$score = $field->get_value_export($entry);
+				$instance = $this->get_instance();
+				$settings = $instance->get_plugin_settings();
+				$minimal = (float)($settings['minimal_score_to_validate'] ?: 0);
+				
+				// If the score is not a value, or above 1, below 0. Summat wrong!
+				if ( !is_numeric($score) || !$this->isNumberBetween(floatval($score), 1, $minimal) ) {
+					$is_spam = true;
+					return $is_spam;
+				}
+			}
+		}
+		return $is_spam;
+	}
+
+	public function isNumberBetween($varToCheck, $high, $low){
+		if($varToCheck < $low) return false;
+		if($varToCheck > $high) return false;
+		return true;
 	}
 
 	// If user has checked "Hide label" checkbox, add

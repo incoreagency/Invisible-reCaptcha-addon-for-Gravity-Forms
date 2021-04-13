@@ -100,6 +100,11 @@ class gfgooglecaptchaaddon extends GFAddOn {
 	 * 
 	 */
 	public function check_if_is_spam($is_spam, $form, $entry) {
+		// no need to go through if something already marked it as spam
+		if ($is_spam) {
+			return $is_spam;
+		}
+		
 		foreach ($form['fields'] as $field) {
 			if ($field instanceof Recaptcha_Score_GF_Field) {
 				$score = $field->get_value_export($entry);
